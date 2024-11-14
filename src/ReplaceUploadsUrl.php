@@ -7,11 +7,17 @@ namespace Kaiseki\WordPress\ReplaceUploadsUrl;
 use Kaiseki\WordPress\Environment\EnvironmentInterface;
 use Kaiseki\WordPress\Hook\HookProviderInterface;
 
-use function __;
-use function add_action;
-use function sprintf;
+use function add_filter;
+use function defined;
+use function is_string;
+use function str_replace;
 use function trim;
+use function wp_upload_dir;
 
+/**
+ * @phpstan-type ImageArray array{string, int, int, bool}
+ * @phpstan-type ResponseArray array{url: string, sizes: array{url: string}[]}
+ */
 final readonly class ReplaceUploadsUrl implements HookProviderInterface
 {
     private ?string $remoteUrl;
@@ -42,6 +48,11 @@ final readonly class ReplaceUploadsUrl implements HookProviderInterface
         add_filter('the_content', [$this, 'replaceInContent'], 999);
     }
 
+    /**
+     * @param ImageArray|false $image
+     *
+     * @return ImageArray|false
+     */
     public function replaceInAttachmentImageSrc(array|false $image): array|false
     {
         if (isset($image[0])) {
@@ -51,6 +62,11 @@ final readonly class ReplaceUploadsUrl implements HookProviderInterface
         return $image;
     }
 
+    /**
+     * @param string[] $attr
+     *
+     * @return string[] $attr
+     */
     public function replaceInAttachmentImageAttributes(array $attr): array
     {
 
@@ -62,16 +78,9 @@ final readonly class ReplaceUploadsUrl implements HookProviderInterface
     }
 
     /**
-     * Modify Image for Javascript
-     * Primarily used for media library
+     * @param ResponseArray $response
      *
-     * @since 1.3.0
-     *
-     * @param array      $response   Array of prepared attachment data
-     * @param int|object $attachment Attachment ID or object
-     * @param array      $meta       Array of attachment metadata
-     *
-     * @return array $response   Modified attachment data
+     * @return ResponseArray $response
      */
     public function replaceInAttachmentForJs(array $response): array
     {
@@ -87,37 +96,18 @@ final readonly class ReplaceUploadsUrl implements HookProviderInterface
         return $response;
     }
 
-    /**
-     * Modify Images in Content
-     *
-     * @since 1.2.0
-     *
-     * @param string $content
-     *
-     * @return string $content
-     */
-    public function replaceInContent(string $content)
+    public function replaceInContent(string $content): string
     {
         return $this->findAndReplaceUrls($content);
     }
 
-    /**
-     * Update Image URL
-     *
-     * @param mixed  $content
-     * @param string $imageUrl
-     *
-     * @return string $image_url
-     *
-     *@since 1.0.0
-     */
-    public function findAndReplaceUrls($content)
+    public function findAndReplaceUrls(string $content): string
     {
-        if (!$content) {
+        if ($content === '') {
             return $content;
         }
 
-        return str_replace($this->localUrl, $this->remoteUrl, $content);
+        return str_replace($this->localUrl, (string)$this->remoteUrl, $content);
     }
 
     private function getUrl(): ?string
