@@ -20,7 +20,7 @@ use function wp_upload_dir;
  */
 final readonly class ReplaceUploadsUrl implements HookProviderInterface
 {
-    private ?string $remoteUrl;
+    private string $remoteUrl;
     private string $localUrl;
 
     public function __construct(
@@ -35,8 +35,7 @@ final readonly class ReplaceUploadsUrl implements HookProviderInterface
     public function addHooks(): void
     {
         if (
-            $this->remoteUrl === null
-            || $this->remoteUrl === ''
+            $this->remoteUrl === ''
             || $this->environment->isProduction()
         ) {
             return;
@@ -49,9 +48,9 @@ final readonly class ReplaceUploadsUrl implements HookProviderInterface
     }
 
     /**
-     * @param ImageArray|false $image
+     * @param false|ImageArray $image
      *
-     * @return ImageArray|false
+     * @return false|ImageArray
      */
     public function replaceInAttachmentImageSrc(array|false $image): array|false
     {
@@ -107,7 +106,7 @@ final readonly class ReplaceUploadsUrl implements HookProviderInterface
             return $content;
         }
 
-        return str_replace($this->localUrl, (string)$this->remoteUrl, $content);
+        return str_replace($this->localUrl, $this->remoteUrl, $content);
     }
 
     private function getUrl(): ?string

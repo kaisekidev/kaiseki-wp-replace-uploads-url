@@ -1,0 +1,20 @@
+{
+    "symbol-whitelist" : [
+        "null", "true", "false",
+        "static", "self", "parent",
+        "array", "string", "int", "float", "bool", "iterable", "callable", "void", "object", "mixed",
+        "add_filter",
+        "wp_upload_dir",
+        "REPLACE_UPLOADS_URL"
+    ],
+    "php-core-extensions" : [
+        "Core",
+        "date",
+        "pcre",
+        "Phar",
+        "Reflection",
+        "SPL",
+        "standard"
+    ],
+    "scan-files": []
+}
