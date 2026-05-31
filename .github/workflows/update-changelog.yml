@@ -7,7 +7,9 @@
 # no bypass) — no plan upgrade needed.
 #
 # Workflow to cut a release (no manual changelog editing):
-#   gh release create vX.Y.Z --generate-notes --target master
+#   gh release create X.Y.Z --generate-notes --title X.Y.Z --target master
+# Tags are bare semver (no `v` prefix); the explicit --title keeps the release
+# name in sync with the tag so the changelog heading is `## X.Y.Z`, not `## vX.Y.Z`.
 # GitHub builds the "What's Changed" notes from merged PR titles; this then
 # writes them into CHANGELOG.md under `## X.Y.Z - <date>` and opens the PR.
 #
